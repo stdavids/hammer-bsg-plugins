@@ -61,7 +61,7 @@ class Sky130BSGFakeramGenerator(HammerSRAMGeneratorTool):
         # Write sram parameters
         cfg['srams']=[]
         for p in self.input_parameters:
-            cfg['srams'].append({'name':p.name, 'width':p.width, 'depth':p.depth, 'banks':p.mux})
+            cfg['srams'].append({'name':p.name, 'width':p.width, 'depth':p.depth, 'banks':1, 'type':'ram'})
         with open(cfg_file_path, 'w') as f: f.write(json.dumps(cfg, indent=2))
         
         # Execute ram generator
