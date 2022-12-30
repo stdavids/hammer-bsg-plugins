@@ -73,10 +73,14 @@ else:
         pass
     ### RTL HARD SPECIFIC FLAGS ###
     elif args.type == "rtl-hard":
-        pass
+        flags += ["build/tech-sky130-cache/primitives.v", "build/tech-sky130-cache/sky130_fd_sc_hd.v"]
+        flags += ["+define+FUNCTIONAL", "+define+UNIT_DELAY"]
+        flags += ["+nospecify", "+notimingchecks"]
     ### SYN FUNCTIONAL SPECIFIC FLAGS ###
     elif args.type == "syn-functional":
-        pass
+        flags += ["build/tech-sky130-cache/primitives.v", "build/tech-sky130-cache/sky130_fd_sc_hd.v"]
+        flags += ["+define+FUNCTIONAL", "+define+UNIT_DELAY"]
+        flags += ["+nospecify", "+notimingchecks"]
     ### SYN SPECIFIC FLAGS ###
     elif args.type == "syn":
         flags += ["build/tech-sky130-cache/primitives.v", "build/tech-sky130-cache/sky130_fd_sc_hd.v"]
@@ -86,7 +90,9 @@ else:
         flags += ["+warn=noSDFCOM_UHICD", "+warn=noSDFCOM_ANICD"]
     ### PAR FUNCTIONAL SPECIFIC FLAGS ###
     elif args.type == "par-functional":
-        pass
+        flags += ["build/tech-sky130-cache/primitives.v", "build/tech-sky130-cache/sky130_fd_sc_hd.v"]
+        flags += ["+define+FUNCTIONAL", "+define+UNIT_DELAY"]
+        flags += ["+nospecify", "+notimingchecks"]
     ### PAR SPECIFIC FLAGS ###
     elif args.type == "par":
         flags += ["build/tech-sky130-cache/primitives.v", "build/tech-sky130-cache/sky130_fd_sc_hd.v"]
