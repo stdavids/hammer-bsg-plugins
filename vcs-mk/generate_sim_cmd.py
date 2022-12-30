@@ -24,33 +24,50 @@ if not args.dve:
     with open(args.cfg, "r") as f:
         cfg = json.load(f)
 
+    if "bsg_root" in cfg:
+        sys.path.append(os.path.join(cfg["bsg_root"], "bsg_mem"))
+        from bsg_ascii_to_rom import bsg_ascii_to_rom
+
 ### DVE ###
 if args.dve:
     ### Environment variables ###
     flags += [f"export SNPSLMD_LICENSE_FILE={env['synopsys.SNPSLMD_LICENSE_FILE']};"]
-    flags += [f"export VCS_HOME={os.sep.join([env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version']])};"]
+    flags += [f"export VCS_HOME={os.path.join(env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version'])};"]
     ### DVE binary ###
-    flags += [f"{os.sep.join([env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version']])}/bin/dve"]
+    flags += [f"{os.path.join(env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version'])}/bin/dve"]
     ### Common flags ###
-    flags += ["-full64", "-vpd", os.sep.join([args.dir, "vcdplus.vpd"])]
+    flags += ["-full64", "-vpd", os.path.join(args.dir, "vcdplus.vpd")]
 
 ### VCS ###
 else:
+    ### Generate Trace Roms ###
+    if "sim.inputs.trace_files" in cfg:
+        for tr in cfg["sim.inputs.trace_files"]:
+            module_name = os.path.splitext(os.path.basename(tr))[0] + "_rom"
+            out_v_file = os.path.join(args.dir, module_name + ".v")
+            with open(out_v_file, "w") as  f:
+                bsg_ascii_to_rom(filename=tr, modulename=module_name, zero=0, spool=f)
+            cfg["sim.inputs.tb_input_files"].append(out_v_file)
     ### Environment variables ###
     flags += [f"export SNPSLMD_LICENSE_FILE={env['synopsys.SNPSLMD_LICENSE_FILE']};"]
-    flags += [f"export VCS_HOME={os.sep.join([env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version']])};"]
+    flags += [f"export VCS_HOME={os.path.join(env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version'])};"]
     # VCS binary ###
-    flags += [f"{os.sep.join([env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version']])}/bin/vcs"]
+    flags += [f"{os.path.join(env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version'])}/bin/vcs"]
     ### Common flags ###
-    flags += ["-full64", "-override_timescale=1ps/1ps", "-sverilog", f"-Mdir={args.dir}", f"-o {os.sep.join([args.dir, 'simv'])}"]
+    flags += ["-full64", "-override_timescale=1ps/1ps", "-sverilog", f"-Mdir={args.dir}", f"-o {os.path.join(args.dir, 'simv')}"]
     ### Debug + waveform ###
     flags += ["-debug_access+all"]
     ### Design input ###
     flags += ["-top", cfg["sim.inputs.tb_name"]]
-    flags += cfg["sim.inputs.input_files"]
-    flags += cfg["sim.inputs.tb_input_files"]
+    v_files = []
+    for i in cfg["sim.inputs.input_files"] + cfg["sim.inputs.tb_input_files"]:
+        if i not in  v_files:
+            v_files.append(i)
+    flags += v_files
     if "sim.inputs.tb_incdir" in cfg:
         flags += ["+incdir+" + i for i in cfg["sim.inputs.tb_incdir"]]
+    if "sim.inputs.tb_defines" in cfg:
+        flags += ["+define+" + i for i in cfg["sim.inputs.tb_defines"]]
     ### RTL SPECIFIC FLAGS ###
     if args.type == "rtl":
         pass
