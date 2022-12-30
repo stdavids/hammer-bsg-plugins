@@ -12,6 +12,13 @@ sim-par-functional: sim-%: $(REAL_OBJ_DIR)/sim-%-rundir/cfg.json
 	-mv sdfAnnotateInfo $(<D)
 	cd $(<D) ; ./simv 2>&1 | tee -i $(<D)/run.log
 
+redo-sim-rtl \
+redo-sim-rtl-hard \
+redo-sim-syn \
+redo-sim-syn-functional \
+redo-sim-par \
+redo-sim-par-functional: redo-sim-%: clean-sim-% sim-%
+
 debug-sim-rtl \
 debug-sim-rtl-hard \
 debug-sim-syn \
