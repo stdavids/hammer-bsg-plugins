@@ -60,10 +60,13 @@ disable-sim:
 	@echo "BSG-ERROR: simulation corner disabled"
 	@false
 
-$(REAL_OBJ_DIR)/sim-rtl-rundir/cfg.json \
-$(REAL_OBJ_DIR)/sim-rtl-hard-rundir/cfg.json:
+$(REAL_OBJ_DIR)/sim-rtl-rundir/cfg.json:
 	mkdir -p $(@D)
 	$(HAMMER_EXEC) -e $(HAMMER_ENV) $(addprefix -p ,$(INPUT_CFGS) $(TB_CFGS)) -l hammer.log --obj_dir $(OBJ_DIR) -o $@ dump
+
+$(REAL_OBJ_DIR)/sim-rtl-hard-rundir/cfg.json: $(SRAM_CFG)
+	mkdir -p $(@D)
+	$(HAMMER_EXEC) -e $(HAMMER_ENV) $(addprefix -p ,$(SRAM_CFG) $(INPUT_CFGS) $(TB_CFGS)) -l hammer.log --obj_dir $(OBJ_DIR) -o $@ dump
 
 $(REAL_OBJ_DIR)/sim-syn-rundir/cfg.json \
 $(REAL_OBJ_DIR)/sim-syn-functional-rundir/cfg.json: $(REAL_OBJ_DIR)/syn-rundir/syn-output-full.json

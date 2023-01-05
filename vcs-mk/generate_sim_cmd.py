@@ -66,6 +66,10 @@ def main ():
         for i in cfg["sim.inputs.input_files"] + cfg["sim.inputs.tb_input_files"]:
             if i not in  v_files:
                 v_files.append(i)
+        if 'vlsi.technology.extra_libraries' in cfg.keys():
+            for i in list(map(lambda x: x['library']['verilog sim'], cfg['vlsi.technology.extra_libraries'])):
+                if i not in  v_files:
+                    v_files.append(i)
         flags += v_files
         if "sim.inputs.tb_incdir" in cfg:
             flags += ["+incdir+" + i for i in cfg["sim.inputs.tb_incdir"]]
