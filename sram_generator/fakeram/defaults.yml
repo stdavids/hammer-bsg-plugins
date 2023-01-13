@@ -48,4 +48,8 @@ sram_generator.fakeram:
   # metal4. If set to true, supply pins on metal4 will be vertical and signal
   # pins will be on metal3.
   flipPins: true
+
+  # In the simulation model, if set to 1, then the output data will latch and
+  # remain unchanged when chip-enable is deasserted.
+  latch_last_read: 1
   

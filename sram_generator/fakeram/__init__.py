@@ -55,7 +55,7 @@ class Sky130BSGFakeramGenerator(HammerSRAMGeneratorTool):
         # Copy over common parameters
         attrs = ['tech_nm', 'voltage', 'metalPrefix', 'flipPins', 'pinWidth_nm', 
                  'pinHeight_nm', 'pinPitch_nm', 'snapWidth_nm', 'snapHeight_nm',
-                 'vlogTimingCheckSignalExpansion']
+                 'latch_last_read', 'vlogTimingCheckSignalExpansion']
         cfg = {}
         for a in attrs: cfg[a] = self.get_setting(f'sram_generator.fakeram.{a}') 
         # Write sram parameters
