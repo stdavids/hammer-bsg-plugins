@@ -118,14 +118,15 @@ def main ():
             flags += ["+define+FUNCTIONAL", "+define+UNIT_DELAY"]
             flags += ["+warn=noSDFCOM_UHICD", "+warn=noSDFCOM_ANICD"]
             assert len(cfg["sim.inputs.input_files"]) == 1
-            dut_path = cfg["sim.inputs.dut_path"] if "sim.inputs.dut_path" in cfg else ""
-            expanded_hier = get_expanded_verilog_hierarchy_modules(cfg["sim.inputs.input_files"][0])
-            with open(os.path.join(args.dir, "bsg_cdc_paths.list"), "w") as f:
-                for inst,path in  expanded_hier:
-                    if "bsg_SYNC_1_r_reg" in path or "bsg_SYNC_1_r_reg" in path:
-                        cdc_path = dut_path + "." + path
-                        print("instance { %s } { noTiming };" % cdc_path, file=f)
-            flags += [f"+optconfigfile+{os.path.join(args.dir, 'bsg_cdc_paths.list')}"]
+            if "sim.inputs.dut_path" in cfg:
+                dut_path = cfg["sim.inputs.dut_path"]
+                expanded_hier = get_expanded_verilog_hierarchy_modules(cfg["sim.inputs.input_files"][0])
+                with open(os.path.join(args.dir, "bsg_cdc_paths.list"), "w") as f:
+                    for inst,path in  expanded_hier:
+                        if "bsg_SYNC_1_r_reg" in path or "bsg_SYNC_1_r_reg" in path:
+                            cdc_path = dut_path + "." + path
+                            print("instance { %s } { noTiming };" % cdc_path, file=f)
+                flags += [f"+optconfigfile+{os.path.join(args.dir, 'bsg_cdc_paths.list')}"]
 
     ### Print out the command ###
     print(" ".join(flags))
