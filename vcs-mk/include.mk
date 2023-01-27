@@ -32,17 +32,17 @@ debug-view-sim-rtl-hard \
 debug-view-sim-syn \
 debug-view-sim-syn-functional \
 debug-view-sim-par \
-debug-view-sim-par-functional: debug-view-sim-%: $(REAL_OBJ_DIR)/sim-%-rundir/vcdplus.vpd
-	$(THIS_DIR)/generate_sim_cmd.py --env=$(HAMMER_ENV) --dir=$(<D) --dve
+debug-view-sim-par-functional: debug-view-sim-%: $(REAL_OBJ_DIR)/sim-%-rundir/waveform.fsdb
+	$(THIS_DIR)/generate_sim_cmd.py --env=$(HAMMER_ENV) --dir=$(<D) --verdi
 
 view-sim-rtl \
 view-sim-rtl-hard \
 view-sim-syn \
 view-sim-syn-functional \
 view-sim-par \
-view-sim-par-functional: view-sim-%: $(REAL_OBJ_DIR)/sim-%-rundir/vcdplus.vpd
-	$(eval DVE_EXEC=$(shell $(THIS_DIR)/generate_sim_cmd.py --env=$(HAMMER_ENV) --dir=$(<D) --dve))
-	$(DVE_EXEC) &
+view-sim-par-functional: view-sim-%: $(REAL_OBJ_DIR)/sim-%-rundir/waveform.fsdb
+	$(eval VERDI_EXEC=$(shell $(THIS_DIR)/generate_sim_cmd.py --env=$(HAMMER_ENV) --dir=$(<D) --verdi))
+	$(VERDI_EXEC) &
 
 clean-sim-rtl \
 clean-sim-rtl-hard \

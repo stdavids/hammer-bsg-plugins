@@ -11,9 +11,9 @@ def main ():
     parser = argparse.ArgumentParser()
     parser.add_argument("--env", required=True)
     parser.add_argument("--dir", required=True)
-    parser.add_argument("--dve", action="store_true")
-    parser.add_argument("--type", required="--dve" not in sys.argv, choices=["rtl", "rtl-hard", "syn", "syn-functional", "par", "par-functional"])
-    parser.add_argument("--cfg", required="--dve" not in sys.argv)
+    parser.add_argument("--verdi", action="store_true")
+    parser.add_argument("--type", required="--verdi" not in sys.argv, choices=["rtl", "rtl-hard", "syn", "syn-functional", "par", "par-functional"])
+    parser.add_argument("--cfg", required="--verdi" not in sys.argv)
     args = parser.parse_args()
 
     flags = []
@@ -23,7 +23,7 @@ def main ():
     with open(args.env, "r") as f:
         env = yaml.safe_load(f)
 
-    if not args.dve:
+    if not args.verdi:
         with open(args.cfg, "r") as f:
             cfg = json.load(f)
 
@@ -31,15 +31,16 @@ def main ():
             sys.path.append(os.path.join(cfg["bsg_root"], "bsg_mem"))
             from bsg_ascii_to_rom import bsg_ascii_to_rom
 
-    ### DVE ###
-    if args.dve:
+    ### VERDI ###
+    if args.verdi:
         ### Environment variables ###
         flags += [f"export SNPSLMD_LICENSE_FILE={env['synopsys.SNPSLMD_LICENSE_FILE']};"]
         flags += [f"export VCS_HOME={os.path.join(env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version'])};"]
-        ### DVE binary ###
-        flags += [f"{os.path.join(env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version'])}/bin/dve"]
+        flags += [f"export VERDI_HOME={os.path.join(env['synopsys.synopsys_home'],'verdi',env['sim.verdi.version'])};"]
+        ### VERDI binary ###
+        flags += [f"{os.path.join(env['synopsys.synopsys_home'],'verdi',env['sim.verdi.version'])}/bin/verdi"]
         ### Common flags ###
-        flags += ["-full64", "-vpd", os.path.join(args.dir, "vcdplus.vpd")]
+        flags += ["-full64", "-ssf", os.path.join(args.dir, "waveform.fsdb")]
 
     ### VCS ###
     else:
@@ -54,12 +55,13 @@ def main ():
         ### Environment variables ###
         flags += [f"export SNPSLMD_LICENSE_FILE={env['synopsys.SNPSLMD_LICENSE_FILE']};"]
         flags += [f"export VCS_HOME={os.path.join(env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version'])};"]
+        flags += [f"export VERDI_HOME={os.path.join(env['synopsys.synopsys_home'],'verdi',env['sim.verdi.version'])};"]
         # VCS binary ###
         flags += [f"{os.path.join(env['synopsys.synopsys_home'],'vcs',env['sim.vcs.version'])}/bin/vcs"]
         ### Common flags ###
         flags += ["-full64", "-override_timescale=1ps/1ps", "-sverilog", f"-Mdir={args.dir}", f"-o {os.path.join(args.dir, 'simv')}"]
         ### Debug + waveform ###
-        flags += ["-debug_access+all"]
+        flags += ["-debug_access+all", "-kdb"]
         ### Design input ###
         flags += ["-top", cfg["sim.inputs.tb_name"]]
         v_files = []
