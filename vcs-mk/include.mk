@@ -60,21 +60,21 @@ disable-sim:
 	@echo "BSG-ERROR: simulation corner disabled"
 	@false
 
-$(REAL_OBJ_DIR)/sim-rtl-rundir/cfg.json:
+$(REAL_OBJ_DIR)/sim-rtl-rundir/cfg.json: $(HAMMER_SIM_DEPENDENCIES)
 	mkdir -p $(@D)
 	$(HAMMER_EXEC) -e $(HAMMER_ENV) $(addprefix -p ,$(INPUT_CFGS) $(TB_CFGS)) -l hammer.log --obj_dir $(OBJ_DIR) -o $@ dump
 
-$(REAL_OBJ_DIR)/sim-rtl-hard-rundir/cfg.json: $(SRAM_CFG)
+$(REAL_OBJ_DIR)/sim-rtl-hard-rundir/cfg.json: $(SRAM_CFG) $(HAMMER_SIM_DEPENDENCIES)
 	mkdir -p $(@D)
 	$(HAMMER_EXEC) -e $(HAMMER_ENV) $(addprefix -p ,$(SRAM_CFG) $(INPUT_CFGS) $(TB_CFGS)) -l hammer.log --obj_dir $(OBJ_DIR) -o $@ dump
 
 $(REAL_OBJ_DIR)/sim-syn-rundir/cfg.json \
-$(REAL_OBJ_DIR)/sim-syn-functional-rundir/cfg.json: $(REAL_OBJ_DIR)/syn-rundir/syn-output-full.json
+$(REAL_OBJ_DIR)/sim-syn-functional-rundir/cfg.json: $(REAL_OBJ_DIR)/syn-rundir/syn-output-full.json $(HAMMER_SIM_DEPENDENCIES)
 	mkdir -p $(@D)
 	$(HAMMER_EXEC) -e $(HAMMER_ENV) -p $< $(addprefix -p ,$(TB_CFGS)) $(HAMMER_EXTRA_ARGS) -o $@ --obj_dir $(OBJ_DIR) syn-to-sim
 
 $(REAL_OBJ_DIR)/sim-par-rundir/cfg.json \
-$(REAL_OBJ_DIR)/sim-par-functional-rundir/cfg.json: $(REAL_OBJ_DIR)/par-rundir/par-output-full.json
+$(REAL_OBJ_DIR)/sim-par-functional-rundir/cfg.json: $(REAL_OBJ_DIR)/par-rundir/par-output-full.json $(HAMMER_SIM_DEPENDENCIES)
 	mkdir -p $(@D)
 	$(HAMMER_EXEC) -e $(HAMMER_ENV) -p $< $(addprefix -p ,$(TB_CFGS)) $(HAMMER_EXTRA_ARGS) -o $@ --obj_dir $(OBJ_DIR) par-to-sim
 
