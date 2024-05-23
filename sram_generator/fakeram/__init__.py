@@ -33,6 +33,26 @@ class Sky130BSGFakeramGenerator(HammerSRAMGeneratorTool):
         return Path(self.run_dir).joinpath('results')
     
     def run_fakeram_generator(self) -> bool:
+        print('''
+
+
+
+
+
+
+
+
+
+                HELLO
+
+
+
+
+
+
+
+
+        ''')
         '''Configure and invoke the Fakeram SRAM generator'''
         # Check tool exists
         generator_makefile = self.get_setting('sram_generator.fakeram.fakeram_make')
@@ -51,22 +71,22 @@ class Sky130BSGFakeramGenerator(HammerSRAMGeneratorTool):
             return True
         
         # Write config file
-        cfg_file_path = os.path.join(self.run_dir, 'fakeram.cfg')
-        # Copy over common parameters
-        attrs = ['tech_nm', 'voltage', 'metalPrefix', 'flipPins', 'pinWidth_nm', 
-                 'pinHeight_nm', 'pinPitch_nm', 'snapWidth_nm', 'snapHeight_nm',
-                 'latch_last_read', 'vlogTimingCheckSignalExpansion']
-        cfg = {}
-        for a in attrs: cfg[a] = self.get_setting(f'sram_generator.fakeram.{a}') 
-        # Write sram parameters
-        cfg['srams']=[]
         for p in self.input_parameters:
+            cfg_file_path = os.path.join(self.run_dir, 'fakeram'+p.name+'.cfg')
+            # Copy over common parameters
+            attrs = ['tech_nm', 'voltage', 'metalPrefix', 'flipPins', 'pinWidth_nm', 
+                     'pinHeight_nm', 'pinPitch_nm', 'snapWidth_nm', 'snapHeight_nm',
+                     'latch_last_read', 'vlogTimingCheckSignalExpansion']
+            cfg = {}
+            for a in attrs: cfg[a] = self.get_setting(f'sram_generator.fakeram.{a}') 
+            # Write sram parameters
+            cfg['srams']=[]
             cfg['srams'].append({'name':p.name, 'width':p.width, 'depth':p.depth, 'banks':1, 'type':'ram'})
-        with open(cfg_file_path, 'w') as f: f.write(json.dumps(cfg, indent=2))
+            with open(cfg_file_path, 'w') as f: f.write(json.dumps(cfg, indent=2))
         
-        # Execute ram generator
-        cmd = ['make', 'run', f'CONFIG={cfg_file_path}', f'OUT_DIR={self.macros_dir}']
-        self.run_executable(cmd, Path(generator_makefile).parent)
+            # Execute ram generator
+            cmd = ['make', 'run', f'CONFIG={cfg_file_path}', f'OUT_DIR={self.macros_dir}']
+            self.run_executable(cmd, Path(generator_makefile).parent)
         
         return True
     
